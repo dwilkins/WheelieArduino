@@ -56,7 +56,7 @@ SRC =  $(ARDUINO)/wiring.c \
 $(ARDUINO)/wiring_analog.c $(ARDUINO)/wiring_digital.c \
 $(ARDUINO)/wiring_pulse.c \
 $(ARDUINO)/wiring_shift.c $(ARDUINO)/WInterrupts.c utility/stringbuffer.c
-CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WMath.cpp $(ARDUINO)/WString.cpp $(ARDUINO)/Print.cpp  $(ARDUINO)/IPAddress.cpp CrawlerCommand.cpp DriveTrain.cpp Wheel.cpp aJSON.cpp main.cpp
+CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WMath.cpp $(ARDUINO)/WString.cpp $(ARDUINO)/Print.cpp  $(ARDUINO)/IPAddress.cpp CrawlerCommand.cpp DriveTrain.cpp Wheel.cpp stepper.cpp aJSON.cpp main.cpp
 FORMAT = ihex
 
 #$(ARDUINO)/wiring_pulse.c $(ARDUINO)/wiring_serial.c \

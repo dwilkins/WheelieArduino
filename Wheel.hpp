@@ -1,7 +1,7 @@
 #ifndef WHEEL_HPP
 #define WHEEL_HPP 1
 
-#define WHEEL_PWM_MAX (int)(255 * .8)
+#define WHEEL_PWM_MAX (int)(255 * .9)
 #define WHEEL_PWM_MIN 0
 #define WHEEL_PWM_MAX_ADJUSTMENT 2
 #define WHEEL_DEFAULT_RAMP_MILLISECONDS 10
@@ -27,12 +27,12 @@ public:
 
   typedef enum {NONE, FORWARD, REVERSE } direction_t;
 
-  int set_pwm_min(int pwm_min = WHEEL_PWM_MIN);
-  int set_pwm_max(int pwm_max = WHEEL_PWM_MAX);
-  int set_pwm_max_adjustment(int pwm_max_adjustment = WHEEL_PWM_MAX_ADJUSTMENT);
-  int set_dir_pin(int pin = 0);
-  int set_pwm_pin(int pin = 0);
-  int set_ramp_milliseconds_per_pwm(int milliseconds = WHEEL_DEFAULT_RAMP_MILLISECONDS);
+  int set_pwm_min(unsigned int pwm_min = WHEEL_PWM_MIN);
+  int set_pwm_max(unsigned int pwm_max = WHEEL_PWM_MAX);
+  int set_pwm_max_adjustment(unsigned int pwm_max_adjustment = WHEEL_PWM_MAX_ADJUSTMENT);
+  int set_dir_pin(unsigned int pin = 0);
+  int set_pwm_pin(unsigned int pin = 0);
+  int set_ramp_milliseconds_per_pwm(unsigned long milliseconds = WHEEL_DEFAULT_RAMP_MILLISECONDS);
   int get_current_direction();
   int get_target_direction();
   int get_previous_direction();
@@ -40,23 +40,23 @@ public:
   int run();
 
 protected:
-  int dir_pin;
-  int brake_pin;
-  int pwm_pin;
-  int current_pwm;
-  int target_pwm;
+  unsigned int dir_pin;
+  unsigned int brake_pin;
+  unsigned int pwm_pin;
+  unsigned int current_pwm;
+  unsigned int target_pwm;
   speed_t current_speed;
   speed_t target_speed;
-  int ramp_millseconds_per_pwm;
+  unsigned long ramp_millseconds_per_pwm;
   direction_t current_direction;
   direction_t target_direction;
   direction_t previous_direction;
-  long last_activity_time;
-  long next_activity_time;
-  long current_activity_time;
-  long pwm_max_adjustment;
-  long pwm_min;
-  long pwm_max;
+  unsigned long last_activity_time;
+  unsigned long next_activity_time;
+  unsigned long current_activity_time;
+  unsigned int pwm_max_adjustment;
+  unsigned int pwm_min;
+  unsigned int pwm_max;
   bool brake;
   speed_t speed;
   bool reached_pwm_target;

@@ -13,6 +13,8 @@ Wheel::Wheel(int pwm_pin,
              int pwm_min,
              int pwm_max_adjustment) {
 
+
+
   set_pwm_pin(pwm_pin);
   set_dir_pin(dir_pin);
   set_pwm_max(pwm_max);
@@ -39,7 +41,7 @@ Wheel::Wheel(int pwm_pin,
 
 int Wheel::run() {
   int retval = -EINVAL;
-  long current_time = millis();
+  unsigned long current_time = millis();
   // Serial.print("current_time = ");
   // Serial.print(current_time,DEC);
   // Serial.print("   next_activity_time = ");
@@ -61,7 +63,7 @@ int Wheel::run() {
   return retval;
 }
 
-int Wheel::set_pwm_pin(int pin) {
+int Wheel::set_pwm_pin(unsigned int pin) {
   int retval = -EINVAL;
   this->pwm_pin = pin;
   if(pwm_pin > 0) {
@@ -72,7 +74,7 @@ int Wheel::set_pwm_pin(int pin) {
   return retval;
 }
 
-int Wheel::set_dir_pin(int pin) {
+int Wheel::set_dir_pin(unsigned int pin) {
   int retval = -EINVAL;
   dir_pin = pin;
   if(dir_pin > 0) {
@@ -83,25 +85,25 @@ int Wheel::set_dir_pin(int pin) {
   return retval;
 }
 
-int Wheel::set_pwm_min(int pwm) {
+int Wheel::set_pwm_min(unsigned int pwm) {
   int retval = -EINVAL;
-  if(pwm_min >= 0 && pwm_min < 256) {
+  if(pwm >= WHEEL_PWM_MIN && pwm <= WHEEL_PWM_MAX) {
     pwm_min = pwm;
     retval = 0;
   }
   return retval;
 }
 
-int Wheel::set_pwm_max(int pwm) {
+int Wheel::set_pwm_max(unsigned int pwm) {
   int retval = -EINVAL;
-  if(pwm >= 0 && pwm < 256) {
+  if(pwm >= WHEEL_PWM_MIN && pwm <= WHEEL_PWM_MAX) {
     pwm_max = pwm;
     retval = 0;
   }
   return retval;
 }
 
-int Wheel::set_pwm_max_adjustment(int pwm) {
+int Wheel::set_pwm_max_adjustment(unsigned int pwm) {
   int retval = -EINVAL;
   if(pwm >= WHEEL_PWM_MIN && pwm < WHEEL_PWM_MAX) {
     pwm_max_adjustment = pwm;
@@ -134,7 +136,7 @@ speed_t Wheel::get_speed() {
   return current_speed;
 }
 
-int Wheel::set_ramp_milliseconds_per_pwm(int milliseconds) {
+int Wheel::set_ramp_milliseconds_per_pwm(unsigned long milliseconds) {
   ramp_millseconds_per_pwm = milliseconds;
   return 0;
 }
@@ -155,7 +157,7 @@ int Wheel::set_ramp_milliseconds_per_pwm(int milliseconds) {
  * pwm as appropriate
  */
 
-int Wheel::process_speed() {
+ int Wheel::process_speed() {
   int retval = -EINVAL;
   // Serial.print(__PRETTY_FUNCTION__);
   if(get_speed() == target_speed) {
@@ -185,9 +187,8 @@ int Wheel::process_pwm() {
   int retval = -EINVAL;
   // Serial.print(__PRETTY_FUNCTION__);
   if(target_pwm != current_pwm) {
-    int old_pwm = current_pwm;
     if(target_pwm < current_pwm) {
-      current_pwm = (current_pwm - pwm_max_adjustment < target_pwm ? target_pwm : current_pwm - pwm_max_adjustment);
+      current_pwm = (current_pwm - target_pwm <= pwm_max_adjustment ? target_pwm : current_pwm - pwm_max_adjustment);
     } else if(target_pwm > current_pwm) {
       current_pwm = (current_pwm + pwm_max_adjustment > target_pwm ? target_pwm : current_pwm + pwm_max_adjustment);
     }
@@ -308,7 +309,7 @@ int Wheel::change_direction_target(Wheel::direction_t new_dir) {
 int Wheel::change_pwm_target(speed_t speed) {
   int retval = -EINVAL;
   float speed_percentage = 0;
-  int new_target_pwm = 0;
+  unsigned int new_target_pwm = 0;
   // Serial.print("change_pwm_target speed = ");
   // Serial.println(speed);
 
@@ -349,37 +350,29 @@ Wheel::direction_t Wheel::direction_from_speed(speed_t speed) {
 
 int Wheel::apply_pwm() {
   int retval = -EINVAL;
-  // Serial.print(__PRETTY_FUNCTION__);
   if(pwm_pin > 0) {
+    if(current_pwm >= pwm_max) {
+      current_pwm = pwm_max;
+    }
     retval = 0;
-    // Serial.print("Pin = ");
-    // Serial.print(pwm_pin,DEC);
-    // Serial.print("   target_pwm = ");
-    // Serial.print(target_pwm);
-    // Serial.print("   current = ");
-    // Serial.println(current_pwm);
     analogWrite(pwm_pin, current_pwm);
   }
-  // Serial.print(" = ");
-  // Serial.println(retval,DEC);
   return retval;
 }
 
 int Wheel::apply_direction() {
   int retval = -EINVAL;
   int dir_val = 0;
-  Serial.print(__PRETTY_FUNCTION__);
   if(dir_pin > 0) {
     if(current_direction == REVERSE) {
       dir_val = 1;
     }
     digitalWrite(dir_pin,dir_val);
+    if(current_direction == NONE) {
+      change_pwm_target(WHEEL_PWM_MIN);
+    }
     retval = 0;
   }
-  Serial.print("(dir_val = ");
-  Serial.print(dir_val);
-  Serial.print(") = ");
-  Serial.println(retval,DEC);
   return retval;
 }
 
